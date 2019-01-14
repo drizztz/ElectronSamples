@@ -17,6 +17,8 @@ html, body, .container-fluid {
   .heading {
     color: rgb(4, 9, 12);
     font-weight: normal;
+    width: 50%;
+    float: left;
   }
 
   .button {
@@ -30,9 +32,9 @@ html, body, .container-fluid {
     font-size: 16px;
   }
   
-  .month-column {
+  .input-column {
     float:left;
-    width:33%;
+    width:30%;
     height:40px;
     background-color:#D6D8DC;
     padding: 4px;

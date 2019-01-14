@@ -110,9 +110,24 @@ function createWindow () {
   })
 }
 
+function isNumber(input) {
+　　var re = /^[0-9]+.?[0-9]*$/; //判断字符串是否为数字 //判断正整数 /^[1-9]+[0-9]*]*$/ 
+　　if (!re.test(input)) {
+　　　　return false;
+　　}
+  return true;
+}
 
 function caculate() {
-  for(var i = 1; i < 13; i++){
+
+  var salary = document.getElementById("salary").value;
+  var baseNumber = document.getElementById("base_number").value;
+
+  if(!isNumber(salary) || salary <= 0 || !isNumber(baseNumber) || baseNumber <= 0) {
+    alert("请输入正确的数字");
+  }
+
+  for(var i = 1; i < 3; i++){
     var idString = "month_" + i;
     // alert(document.getElementById("month_1"));
     document.getElementById("month_" + i).value = "month_" + i;
