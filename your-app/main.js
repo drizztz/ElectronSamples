@@ -99,7 +99,7 @@ function createWindow () {
   win.loadFile('index.html')
 
   // 打开开发者工具
-  // win.webContents.openDevTools()
+  win.webContents.openDevTools()
 
   // 当 window 被关闭，这个事件会被触发。
   win.on('closed', () => {
@@ -118,21 +118,70 @@ function isNumber(input) {
   return true;
 }
 
+
+function getRateAndShortcutNumber( amount ) {
+    if( amount < 36000) {
+      return [0.03, 0];
+    } else if( amount < 144000) {
+      return [0.1, 2520];
+    } else if( amount < 300000) {
+      return [0.2, 16920];
+    } else if( amount < 420000) {
+      return [0.25, 31920];
+    } else if( amount < 660000) {
+      return [0.3, 52920];
+    } else if( amount < 960000) {
+      return [0.35, 85920];
+    } else {
+      return [0.45, 181920];
+    }
+}
+
+
+function getSum(array) {
+  var sum = 0;
+  array.forEach( value => {
+    sum += value;
+  });
+  return sum;
+}
+
+
+
 function caculate() {
 
-  var salary = document.getElementById("salary").value;
-  var baseNumber = document.getElementById("base_number").value;
-
-  if(!isNumber(salary) || salary <= 0 || !isNumber(baseNumber) || baseNumber <= 0) {
+  var salary = Number(document.getElementById("salary").value);
+  // var baseNumber = document.getElementById("base_number").value;
+  var deduction = 5000 + Number(document.getElementById("deductible_number").value);
+  if(!isNumber(salary) || salary <= 0 || !isNumber(deduction) || deduction - 5000 <= 0) {
     alert("请输入正确的数字");
   }
-
-  for(var i = 1; i < 3; i++){
-    var idString = "month_" + i;
-    // alert(document.getElementById("month_1"));
-    document.getElementById("month_" + i).value = "month_" + i;
+  var taxArray = new Array(12);
+  // alert("salary:" + salary);
+  // alert("deduction:" + deduction);
+  var netSalary = getNetSalary(salary, deduction);
+  for(var index = 1; index <= 2; index ++) {
+    var RateAndShortcutNumber = getRateAndShortcutNumber(netSalary * index);
+    // alert("netSalary:" + netSalary);
+    // alert("RateAndShortcutNumber:" + RateAndShortcutNumber);
+    var taxOfCurrentMonth = netSalary * index * RateAndShortcutNumber[0] - RateAndShortcutNumber[1] - getSum(taxArray);
+    taxArray[index-1] = taxOfCurrentMonth;
   }
-  
+  // alert(taxArray);
+}
+
+function getNetSalary (salary, deduction) {
+  var baseNumber = 0;
+  if (salary < 4279) {
+    baseNumber = 4279;
+  } else if (salary < 21396) {
+    baseNumber = salary;
+  } else {
+    baseNumber = 21396;
+  }
+  // var netSalary = Number(salary) - Number(4500) - Number(deduction);
+  var netSalary = Number(salary) - Number(baseNumber * 0.175) - Number(deduction);
+  return netSalary;
 }
 
 // Electron 会在初始化后并准备
