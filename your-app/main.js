@@ -4,93 +4,6 @@ const { app, BrowserWindow, Menu } = require('electron')
 // 垃圾回收的时候，window对象将会自动的关闭
 let win
 
-const template = [
-  {
-    label: 'Edit',
-    submenu: [
-      { role: 'undo' },
-      { role: 'redo' },
-      { type: 'separator' },
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' },
-      { role: 'pasteandmatchstyle' },
-      { role: 'delete' },
-      { role: 'selectall' }
-    ]
-  },
-  {
-    label: 'View',
-    submenu: [
-      { role: 'reload' },
-      { role: 'forcereload' },
-      { role: 'toggledevtools' },
-      { type: 'separator' },
-      { role: 'resetzoom' },
-      { role: 'zoomin' },
-      { role: 'zoomout' },
-      { type: 'separator' },
-      { role: 'togglefullscreen' }
-    ]
-  },
-  {
-    role: 'window',
-    submenu: [
-      { role: 'minimize' },
-      { role: 'close' }
-    ]
-  },
-  {
-    role: 'help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click () { require('electron').shell.openExternal('https://electronjs.org') }
-      }
-    ]
-  }
-]
-
-if (process.platform === 'darwin') {
-  template.unshift({
-    label: app.getName(),
-    submenu: [
-      { role: 'about' },
-      { type: 'separator' },
-      { role: 'services' },
-      { type: 'separator' },
-      { role: 'hide' },
-      { role: 'hideothers' },
-      { role: 'unhide' },
-      { type: 'separator' },
-      { role: 'quit' }
-    ]
-  })
-
-  // Edit menu
-  template[1].submenu.push(
-    { type: 'separator' },
-    {
-      label: 'Speech',
-      submenu: [
-        { role: 'startspeaking' },
-        { role: 'stopspeaking' }
-      ]
-    }
-  )
-
-  // Window menu
-  template[3].submenu = [
-    { role: 'close' },
-    { role: 'minimize' },
-    { role: 'zoom' },
-    { type: 'separator' },
-    { role: 'front' }
-  ]
-}
-
-
-
 function createWindow () {
   // 创建浏览器窗口。
   win = new BrowserWindow({ width: 800, height: 600 })
@@ -153,21 +66,21 @@ function caculate() {
   var salary = Number(document.getElementById("salary").value);
   // var baseNumber = document.getElementById("base_number").value;
   var deduction = 5000 + Number(document.getElementById("deductible_number").value);
-  if(!isNumber(salary) || salary <= 0 || !isNumber(deduction) || deduction - 5000 <= 0) {
+  if(!isNumber(salary) || salary <= 0 || !isNumber(deduction)) {
     alert("请输入正确的数字");
+    return;
   }
   var taxArray = new Array(12);
   // alert("salary:" + salary);
   // alert("deduction:" + deduction);
   var netSalary = getNetSalary(salary, deduction);
-  for(var index = 1; index <= 2; index ++) {
+  var taxSum = 0;
+  for(var index = 1; index <= 12; index ++) {
     var RateAndShortcutNumber = getRateAndShortcutNumber(netSalary * index);
-    // alert("netSalary:" + netSalary);
-    // alert("RateAndShortcutNumber:" + RateAndShortcutNumber);
-    var taxOfCurrentMonth = netSalary * index * RateAndShortcutNumber[0] - RateAndShortcutNumber[1] - getSum(taxArray);
+    var taxOfCurrentMonth = Math.max(netSalary * index * RateAndShortcutNumber[0] - RateAndShortcutNumber[1] - getSum(taxArray),0);
     taxArray[index-1] = taxOfCurrentMonth;
+    document.getElementById("month_" + index).value = taxOfCurrentMonth;
   }
-  // alert(taxArray);
 }
 
 function getNetSalary (salary, deduction) {
@@ -179,7 +92,6 @@ function getNetSalary (salary, deduction) {
   } else {
     baseNumber = 21396;
   }
-  // var netSalary = Number(salary) - Number(4500) - Number(deduction);
   var netSalary = Number(salary) - Number(baseNumber * 0.175) - Number(deduction);
   return netSalary;
 }
